@@ -1,5 +1,7 @@
 // deliberate ES3 code style for maximum browsers coverage
 function renderDiscs(targetElem) {
+    var MAX_VARIATIONS_DISPLAYED = 4;
+
     var content = _load('wantlist');
     var data = JSON.parse(content).wants;
     var outputData = {};
@@ -39,6 +41,7 @@ function renderDiscs(targetElem) {
     for (var i = 0; i < outputDataSortedKeys.length; i++) {
         var item = outputData[outputDataSortedKeys[i]];
         var variationsCount = item.variations.length;
+        var tooManyVariations = (variationsCount > MAX_VARIATIONS_DISPLAYED);
         outputItems.push(
             '  <b>' + item.titleString.toUpperCase() + '</b>' +
             ' (' + _variationPhrase(variationsCount) + '):'
@@ -47,10 +50,16 @@ function renderDiscs(targetElem) {
             var info = item.variations[j];
             var url = info.resource_url.replace('/api.', '/www.').replace('/releases/', '/release/');
             var salesUrl = url.replace('/release/', '/sell/release/');
+            var before = (j === MAX_VARIATIONS_DISPLAYED) ?
+                '<span>  <button onclick="moreDiscs(this)">more</button></span><span style="display: none;">' :
+                '';
+            var after = (tooManyVariations && (j === (variationsCount - 1))) ? '</span>' : '';
             outputItems.push(
+                before +
                 '- <a href="' + url + '" target="_blank">' + _getTitleString(info) + '</a>' +
                 ' <i>' + _getDetailsString(info) + '</i>' +
-                ' [<a href="' + salesUrl + '" target="_blank">purchase</a>]'
+                ' [<a href="' + salesUrl + '" target="_blank">purchase</a>]' +
+                after
             );
         }
         outputItems.push('\n');
@@ -121,4 +130,10 @@ function renderDiscs(targetElem) {
             throw new Error(xhr.status + ': ' + xhr.statusText);
         }
     }
+}
+
+function moreDiscs(elem) {
+    var parentElem = elem.parentNode;
+    parentElem.style.display = 'none';
+    parentElem.nextElementSibling.style.display = '';
 }
