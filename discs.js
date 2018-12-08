@@ -99,8 +99,8 @@ function renderDiscs(targetElem) {
             detailsString += '[' + formats.join(' / ') + ']';
         }
 
-        if (item.year) {
-            detailsString += ' (' + item.year + ')';
+        if (info.year) {
+            detailsString += ' (' + info.year + ')';
         }
 
         return detailsString;
