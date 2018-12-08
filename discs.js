@@ -44,7 +44,7 @@ function renderDiscs(targetElem) {
         var tooManyVariations = (variationsCount > MAX_VARIATIONS_DISPLAYED);
         outputItems.push(
             '  <b>' + item.titleString.toUpperCase() + '</b>' +
-            ' (' + _variationPhrase(variationsCount) + '):'
+            ' (' + _variationsPhrase(item) + '):'
         );
         for (var j = 0; j < variationsCount; j++) {
             var info = item.variations[j];
@@ -67,10 +67,20 @@ function renderDiscs(targetElem) {
     targetElem.innerHTML = outputItems.join('\n');
 
 
-    function _variationPhrase(number) {
-        var isMultiple = number > 1;
-        return (isMultiple ? 'any of these' : 'only') + ' ' +
-            number + ' variation' + (isMultiple ? 's' : '') + ' wanted';
+    function _variationsPhrase(item) {
+        var firstArtistName = item.info.artists[0].name;
+        var variationsCount = item.variations.length;
+        var multipleVariations = (variationsCount > 1);
+        var tooManyVariations = variationsCount > MAX_VARIATIONS_DISPLAYED;
+
+        switch (true) {
+            case (tooManyVariations && /beatles/i.test(firstArtistName)):
+                return 'any <u>stereo CD</u> wanted; not Hungary!';
+            case (multipleVariations):
+                return 'any of these ' + variationsCount + ' variations wanted';
+            default:
+                return 'only one variation wanted';
+        }
     }
 
     function _getTitleString(info) {
