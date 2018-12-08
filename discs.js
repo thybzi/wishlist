@@ -2,27 +2,109 @@
 function renderDiscs(targetElem) {
     var content = _load('wantlist');
     var data = JSON.parse(content).wants;
-    var masters = [];
-    var outputItems = [];
+    var outputData = {};
+    var outputDataKeys = [];
     for (var i = 0; i < data.length; i++) {
         var item = data[i];
         var info = item.basic_information;
-        if (typeof info.master_url === 'string') {
-            if (!!~masters.indexOf(info.master_url)) {
-                continue;
-            } else {
-                masters.push(info.master_url);
-            }
+        var key = info.master_id || info.id;
+
+        if (!outputData.hasOwnProperty(key)) {
+            outputData[key] = {
+                titleString: _getTitleString(info),
+                info: info,
+                variations: []
+            };
+            outputDataKeys.push(key);
+
+        } else if (info.year && (info.year < outputData[key].info.year)) {
+            outputData[key].info = info;
+            outputData[key].titleString = _getTitleString(info);
         }
-        var title = info.title;
-        var year = info.year;
-        var artists = [];
-        for (var j = 0; j < info.artists.length; j++) {
-            artists.push(info.artists[j].name);
-        }
-        outputItems.push(artists.join(', ') + ' — ' + title + ' (' + year + ')');
+
+        outputData[key].variations.push(info);
     }
-    targetElem.innerHTML = outputItems.sort().join('\n');
+
+    var outputDataSortedKeys = outputDataKeys.sort(function (keyA, keyB) {
+        if (outputData[keyA].titleString > outputData[keyB].titleString) {
+            return 1;
+        } else if (outputData[keyA].titleString < outputData[keyB].titleString) {
+            return -1;
+        } else {
+            return 0;
+        }
+    });
+
+    var outputItems = [];
+    for (var i = 0; i < outputDataSortedKeys.length; i++) {
+        var item = outputData[outputDataSortedKeys[i]];
+        var variationsCount = item.variations.length;
+        outputItems.push(
+            '  <b>' + item.titleString.toUpperCase() + '</b>' +
+            ' (' + _variationPhrase(variationsCount) + '):'
+        );
+        for (var j = 0; j < variationsCount; j++) {
+            var info = item.variations[j];
+            var url = info.resource_url.replace('/api.', '/www.').replace('/releases/', '/release/');
+            var salesUrl = url.replace('/release/', '/sell/release/');
+            outputItems.push(
+                '- <a href="' + url + '" target="_blank">' + _getTitleString(info) + '</a>' +
+                ' <i>' + _getDetailsString(info) + '</i>' +
+                ' [<a href="' + salesUrl + '" target="_blank">purchase</a>]'
+            );
+        }
+        outputItems.push('\n');
+    }
+    targetElem.innerHTML = outputItems.join('\n');
+
+
+    function _variationPhrase(number) {
+        var isMultiple = number > 1;
+        return (isMultiple ? 'any of these' : 'only') + ' ' +
+            number + ' variation' + (isMultiple ? 's' : '') + ' wanted';
+    }
+
+    function _getTitleString(info) {
+        var title = info.title;
+        var artists = [];
+
+        for (var i = 0; i < info.artists.length; i++) {
+            artists.push(info.artists[i].name.replace(/\s+\(\d+\)$/, ''));
+        }
+        var titleString = artists.join(', ') + ' — ' + title;
+
+        return titleString;
+    }
+
+    function _getDetailsString(info) {
+        var detailsString = '';
+
+        var formats = [];
+        for (var i = 0; i < info.formats.length; i++) {
+            var item = info.formats[i];
+            var itemParts = [];
+            if (item.descriptions) {
+                itemParts.push(item.descriptions.join(', '));
+            }
+            if (item.name) {
+                var qty = item.qty || 1;
+                itemParts.push(((qty > 1) ? (qty + 'x') : '') + item.name);
+            }
+            if (item.text) {
+                itemParts.push(item.text);
+            }
+            formats.push(itemParts.join('; '));
+        }
+        if (formats.length > 0) {
+            detailsString += '[' + formats.join(' / ') + ']';
+        }
+
+        if (item.year) {
+            detailsString += ' (' + item.year + ')';
+        }
+
+        return detailsString;
+    }
 
     function _load(cmd, id) {
         var scriptUrl = 'https://thybzicom.000webhostapp.com/discogs.php';
