@@ -117,7 +117,7 @@ function renderDiscs(targetElem) {
         if (formats.length > 0) {
             detailsString += '[' + formats.join(' / ') + ']';
         }
-        
+
         var catnos = [];
         for (var i = 0; i < info.labels.length; i++) {
             var item = info.labels[i];
