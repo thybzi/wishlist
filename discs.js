@@ -98,10 +98,6 @@ function renderDiscs(targetElem) {
     function _getDetailsString(info) {
         var detailsString = '';
 
-        if (info.year) {
-            detailsString += '(' + info.year + ') ';
-        }
-
         var formats = [];
         for (var i = 0; i < info.formats.length; i++) {
             var item = info.formats[i];
@@ -131,6 +127,10 @@ function renderDiscs(targetElem) {
         }
         if (catnos.length > 0) {
             detailsString += ' [' + catnos.join(' | ') + ']';
+        }
+
+        if (info.year) {
+            detailsString += ' (' + info.year + ')';
         }
 
         return detailsString;
