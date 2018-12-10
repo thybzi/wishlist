@@ -117,6 +117,17 @@ function renderDiscs(targetElem) {
         if (formats.length > 0) {
             detailsString += '[' + formats.join(' / ') + ']';
         }
+        
+        var catnos = [];
+        for (var i = 0; i < info.labels.length; i++) {
+            var item = info.labels[i];
+            if (item.catno && (item.catno !== 'none')) {
+                catnos.push(item.catno);
+            }
+        }
+        if (catnos.length > 0) {
+            detailsString += ' [' + catnos.join(' | ') + ']';
+        }
 
         if (info.year) {
             detailsString += ' (' + info.year + ')';
