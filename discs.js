@@ -1,15 +1,31 @@
 // deliberate ES3 code style for maximum browsers coverage
-function renderDiscs(targetElem) {
+function renderDiscs(mainTargetElem, auxTargetElem) {
     var MAX_VARIATIONS_DISPLAYED = 4;
+
+    var collectedKeys = [];
+    var collectionContent = _load('collection');
+    var collectionData = JSON.parse(collectionContent).releases;
+    for (var i = 0; i < collectionData.length; i++) {
+        var item = collectionData[i];
+        var key = _getReleaseKey(item.basic_information);
+        if (!~collectedKeys.indexOf(key)) {
+            collectedKeys.push(key);
+        }
+    }
 
     var content = _load('wantlist');
     var data = JSON.parse(content).wants;
-    var outputData = {};
-    var outputDataKeys = [];
+    var mainOutputData = {};
+    var mainOutputDataKeys = [];
+    var auxOutputData = {};
+    var auxOutputDataKeys = [];
     for (var i = 0; i < data.length; i++) {
         var item = data[i];
         var info = item.basic_information;
-        var key = info.master_id || info.id;
+        var key = _getReleaseKey(info);
+        var isAux = !!~collectedKeys.indexOf(key)
+        var outputData = isAux ? auxOutputData : mainOutputData;
+        var outputDataKeys = isAux ? auxOutputDataKeys : mainOutputDataKeys;
 
         if (!outputData.hasOwnProperty(key)) {
             outputData[key] = {
@@ -27,45 +43,55 @@ function renderDiscs(targetElem) {
         outputData[key].variations.push(info);
     }
 
-    var outputDataSortedKeys = outputDataKeys.sort(function (keyA, keyB) {
-        if (outputData[keyA].titleString > outputData[keyB].titleString) {
-            return 1;
-        } else if (outputData[keyA].titleString < outputData[keyB].titleString) {
-            return -1;
-        } else {
-            return 0;
-        }
-    });
+    mainTargetElem.innerHTML = _getReleasesMarkup(mainOutputData, mainOutputDataKeys);
+    auxTargetElem.innerHTML = _getReleasesMarkup(auxOutputData, auxOutputDataKeys);
 
-    var outputItems = [];
-    for (var i = 0; i < outputDataSortedKeys.length; i++) {
-        var item = outputData[outputDataSortedKeys[i]];
-        var variationsCount = item.variations.length;
-        var tooManyVariations = (variationsCount > MAX_VARIATIONS_DISPLAYED);
-        outputItems.push(
-            '  <b>' + item.titleString.toUpperCase() + '</b>' +
-            ' (' + _variationsPhrase(item) + '):'
-        );
-        for (var j = 0; j < variationsCount; j++) {
-            var info = item.variations[j];
-            var url = info.resource_url.replace('/api.', '/www.').replace('/releases/', '/release/');
-            var salesUrl = url.replace('/release/', '/sell/release/');
-            var before = (j === MAX_VARIATIONS_DISPLAYED) ?
-                '<span>  <button onclick="moreDiscs(this)">more</button></span><span style="display: none;">' :
-                '';
-            var after = (tooManyVariations && (j === (variationsCount - 1))) ? '</span>' : '';
+
+    function _getReleasesMarkup(outputData, outputDataKeys) {
+
+        var outputDataSortedKeys = outputDataKeys.sort(function (keyA, keyB) {
+            if (outputData[keyA].titleString > outputData[keyB].titleString) {
+                return 1;
+            } else if (outputData[keyA].titleString < outputData[keyB].titleString) {
+                return -1;
+            } else {
+                return 0;
+            }
+        });
+
+        var outputItems = [];
+        for (var i = 0; i < outputDataSortedKeys.length; i++) {
+            var item = outputData[outputDataSortedKeys[i]];
+            var variationsCount = item.variations.length;
+            var tooManyVariations = (variationsCount > MAX_VARIATIONS_DISPLAYED);
             outputItems.push(
-                before +
-                '- <a href="' + url + '" target="_blank">' + _getTitleString(info) + '</a>' +
-                ' <i>' + _getDetailsString(info) + '</i>' +
-                ' [<a href="' + salesUrl + '" target="_blank">purchase</a>]' +
-                after
+                '  <b>' + item.titleString.toUpperCase() + '</b>' +
+                ' (' + _variationsPhrase(item) + '):'
             );
+            for (var j = 0; j < variationsCount; j++) {
+                var info = item.variations[j];
+                var url = info.resource_url.replace('/api.', '/www.').replace('/releases/', '/release/');
+                var salesUrl = url.replace('/release/', '/sell/release/');
+                var before = (j === MAX_VARIATIONS_DISPLAYED) ?
+                    '<span>  <button onclick="moreDiscs(this)">more</button></span><span style="display: none;">' :
+                    '';
+                var after = (tooManyVariations && (j === (variationsCount - 1))) ? '</span>' : '';
+                outputItems.push(
+                    before +
+                    '- <a href="' + url + '" target="_blank">' + _getTitleString(info) + '</a>' +
+                    ' <i>' + _getDetailsString(info) + '</i>' +
+                    ' [<a href="' + salesUrl + '" target="_blank">purchase</a>]' +
+                    after
+                );
+            }
+            outputItems.push('\n');
         }
-        outputItems.push('\n');
+        return outputItems.join('\n');
     }
-    targetElem.innerHTML = outputItems.join('\n');
 
+    function _getReleaseKey(info) {
+        return info.master_id || info.id;
+    }
 
     function _variationsPhrase(item) {
         var firstArtistName = item.info.artists[0].name;

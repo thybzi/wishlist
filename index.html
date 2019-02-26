@@ -8,6 +8,7 @@
         body { font-size: 14px; }
         pre { white-space: pre-wrap; margin-bottom: 2em; }
         button {margin-top: 2px; }
+        abbr { cursor: help; }
     </style>
     <meta name="viewport" content="width=device-width, initial-scale=1">
 </head>
@@ -38,8 +39,11 @@ href="https://market.yandex.ru/product--vneshniaia-zvukovaia-karta-esi-u22-xt/13
 <h2>discs</h2>
 <pre id="discs">loading…</pre>
 
+<h2><abbr title="already have these, but wish another version">additional</abbr> discs</h2>
+<pre id="aux_discs">loading…</pre>
+
 <script>
-    renderDiscs(document.getElementById('discs'));
+    renderDiscs(document.getElementById('discs'), document.getElementById('aux_discs'));
 </script>
 
 </body>
