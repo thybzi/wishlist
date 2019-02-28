@@ -36,14 +36,21 @@ href="https://market.yandex.ru/product--vneshniaia-zvukovaia-karta-esi-u22-xt/13
 - <i>(expensive!)</i> <a href="https://market.yandex.ru/product--smartfon-motorola-moto-z2-play-64gb/1730804316" target="_blank">Moto Z2 Play</a> phone + <a href="https://www.indiegogo.com/projects/keyboard-mod-a-physical-keyboard-for-the-moto-z#/" target="_blank">keyboard mod</a>
 </pre>
 
-<h2>discs</h2>
+<h2>cd</h2>
 <pre id="discs">loading…</pre>
 
-<h2><abbr title="already have these, but wish another version">additional</abbr> discs</h2>
+<h2>vynil, cassette, dvd</h2>
+<pre id="noncd_discs">loading…</pre>
+
+<h2><abbr title="already have these, but wish another version">additional</abbr> cd</h2>
 <pre id="aux_discs">loading…</pre>
 
 <script>
-    renderDiscs(document.getElementById('discs'), document.getElementById('aux_discs'));
+    renderDiscs(
+        document.getElementById('discs'),
+        document.getElementById('aux_discs'),
+        document.getElementById('noncd_discs')
+    );
 </script>
 
 </body>

@@ -1,15 +1,19 @@
 // deliberate ES3 code style for maximum browsers coverage
-function renderDiscs(mainTargetElem, auxTargetElem) {
+function renderDiscs(mainTargetElem, auxTargetElem, noncdTargetElem) {
     var MAX_VARIATIONS_DISPLAYED = 4;
 
-    var collectedKeys = [];
+    var collectedCdKeys = [];
     var collectionContent = _load('collection');
     var collectionData = JSON.parse(collectionContent).releases;
     for (var i = 0; i < collectionData.length; i++) {
         var item = collectionData[i];
-        var key = _getReleaseKey(item.basic_information);
-        if (!~collectedKeys.indexOf(key)) {
-            collectedKeys.push(key);
+        var info = item.basic_information;
+        if (_isNonCd(info)) {
+            continue;
+        }
+        var key = _getReleaseKey(info);
+        if (!~collectedCdKeys.indexOf(key)) {
+            collectedCdKeys.push(key);
         }
     }
 
@@ -19,13 +23,26 @@ function renderDiscs(mainTargetElem, auxTargetElem) {
     var mainOutputDataKeys = [];
     var auxOutputData = {};
     var auxOutputDataKeys = [];
+    var noncdOutputData = {};
+    var noncdOutputDataKeys = [];
     for (var i = 0; i < data.length; i++) {
         var item = data[i];
         var info = item.basic_information;
         var key = _getReleaseKey(info);
-        var isAux = !!~collectedKeys.indexOf(key)
-        var outputData = isAux ? auxOutputData : mainOutputData;
-        var outputDataKeys = isAux ? auxOutputDataKeys : mainOutputDataKeys;
+        var isNonCd = _isNonCd(info);
+        var isAux = !isNonCd && !!~collectedCdKeys.indexOf(key);
+
+        var outputData, outputDataKeys;
+        if (isNonCd) {
+            outputData = noncdOutputData;
+            outputDataKeys = noncdOutputDataKeys;
+        } else if (isAux) {
+            outputData = auxOutputData;
+            outputDataKeys = auxOutputDataKeys;
+        } else {
+            outputData = mainOutputData;
+            outputDataKeys = mainOutputDataKeys
+        }
 
         if (!outputData.hasOwnProperty(key)) {
             outputData[key] = {
@@ -45,6 +62,7 @@ function renderDiscs(mainTargetElem, auxTargetElem) {
 
     mainTargetElem.innerHTML = _getReleasesMarkup(mainOutputData, mainOutputDataKeys);
     auxTargetElem.innerHTML = _getReleasesMarkup(auxOutputData, auxOutputDataKeys);
+    noncdTargetElem.innerHTML = _getReleasesMarkup(noncdOutputData, noncdOutputDataKeys);
 
 
     function _getReleasesMarkup(outputData, outputDataKeys) {
@@ -160,6 +178,18 @@ function renderDiscs(mainTargetElem, auxTargetElem) {
         }
 
         return detailsString;
+    }
+
+    function _isNonCd(info) {
+        var hasCdFormat = false;
+        for (var i = 0; i < info.formats.length; i++) {
+            var item = info.formats[i];
+            if ((item.name === 'CD') || (item.name === 'CDr')) {
+                hasCdFormat = true;
+                break;
+            }
+        }
+        return !hasCdFormat;
     }
 
     function _load(cmd, id) {
