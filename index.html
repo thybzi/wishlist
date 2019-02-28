@@ -6,9 +6,12 @@
     <script src="discs.js"></script>
     <style>
         body { font-size: 14px; }
-        pre { white-space: pre-wrap; margin-bottom: 2em; }
+        h2 { margin-top: 0; padding-top: 0.5em; }
+        pre { white-space: pre-wrap; margin-bottom: 1.5em; }
         button {margin-top: 2px; }
         abbr { cursor: help; }
+        nav { position: fixed; right: 15px; top: 12px; line-height: 1.7em; }
+        nav a { display: block; }
     </style>
     <meta name="viewport" content="width=device-width, initial-scale=1">
 </head>
@@ -16,7 +19,14 @@
 
 <h1>Evgeni Dmitriev (thybzi) personal wishlist</h1>
 
-<h2>misc</h2>
+<nav>
+    <a href="#misc" title="non-discs">misc</a>
+    <a href="#cd" title="CD discs">cd</a>
+    <a href="#noncd" title="vynil, cassettes, DVDs etc">vynil etc</a>
+    <a href="#auxcd" title="additional CDs (need another version of them)">aux cd</a>
+</nav>
+
+<h2 id="misc">misc</h2>
 <pre>
 - <a href="https://aliexpress.com/item/OEM-Ear-pads-cushion-earpads-for-Marshall-Monitor-Over-Ear-Stereo-Headphones/32802828531.html" target="_blank">ear cushions</a> for Marshal Monitor headphones (one or multiple pairs)
 - bicycle <i>dynamo</i> front light <a href="https://www.ebay.com/itm/Trelock-Scheinwerfer-Bike-I-Uno-LS-690-uno-500-6-fur-Bosch-kompatibel/132856545573?hash=item1eeede0125:g:K-AAAOSwXMxb7Vet" target="_blank">Trelock bike-i Uno</a> (LS 690, LS 693, LS 695)
@@ -36,13 +46,13 @@ href="https://market.yandex.ru/product--vneshniaia-zvukovaia-karta-esi-u22-xt/13
 - <i>(expensive!)</i> <a href="https://market.yandex.ru/product--smartfon-motorola-moto-z2-play-64gb/1730804316" target="_blank">Moto Z2 Play</a> phone + <a href="https://www.indiegogo.com/projects/keyboard-mod-a-physical-keyboard-for-the-moto-z#/" target="_blank">keyboard mod</a>
 </pre>
 
-<h2>cd</h2>
+<h2 id="cd">cd</h2>
 <pre id="discs">loading…</pre>
 
-<h2>vynil, cassette, dvd</h2>
+<h2 id="noncd">vynil, cassette, dvd</h2>
 <pre id="noncd_discs">loading…</pre>
 
-<h2><abbr title="already have these, but wish another version">additional</abbr> cd</h2>
+<h2 id="auxcd"><abbr title="already have these, but wish another version">additional</abbr> cd</h2>
 <pre id="aux_discs">loading…</pre>
 
 <script>
