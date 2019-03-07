@@ -30,7 +30,8 @@ function renderDiscs(mainTargetElem, auxTargetElem, noncdTargetElem) {
         var info = item.basic_information;
         var key = _getReleaseKey(info);
         var isNonCd = _isNonCd(info);
-        var isAux = !isNonCd && !!~collectedCdKeys.indexOf(key);
+        var isPriority = _isPriorityRelease(info);
+        var isAux = !isNonCd && (!isPriority || !!~collectedCdKeys.indexOf(key));
 
         var outputData, outputDataKeys;
         if (isNonCd) {
@@ -128,15 +129,15 @@ function renderDiscs(mainTargetElem, auxTargetElem, noncdTargetElem) {
     }
 
     function _getTitleString(info) {
-        var title = info.title;
-        var artists = [];
+        return _getArtistsString(info) + ' — ' + info.title;
+    }
 
+    function _getArtistsString(info) {
+        var artists = [];
         for (var i = 0; i < info.artists.length; i++) {
             artists.push(info.artists[i].name.replace(/\s+\(\d+\)$/, ''));
         }
-        var titleString = artists.join(', ') + ' — ' + title;
-
-        return titleString;
+        return artists.join(', ');
     }
 
     function _getDetailsString(info) {
@@ -190,6 +191,61 @@ function renderDiscs(mainTargetElem, auxTargetElem, noncdTargetElem) {
             }
         }
         return !hasCdFormat;
+    }
+
+    function _isPriorityRelease(info) {
+        var priorityArtists = [
+            '1/2 Orchestra',
+            'Artrosis',
+            'Autumn',
+            'Beseech',
+            'Elf',
+            'Europe',
+            'Evoke Thy Lords',
+            'Forces United',
+            'Fort Royal',
+            'J:Морс',
+            'Lake of Tears',
+            'Lullacry',
+            'Margenta',
+            'Offroad',
+            'Pharaoh',
+            'Rainbow',
+            'Shape of Despair',
+            'Silentium',
+            'Stream of Passion',
+            'Sunterra',
+            'Symphomania',
+            'Tad Morose',
+            'The Equinox ov the Gods',
+            'The Gathering',
+            'Zodiac',
+            'Август',
+            'Агата Кристи',
+            'Андрей Макаревич',
+            'Артерия|Терентьев|Glossy Teria',
+            'Буланова',
+            'Бутусов|Nautilus Pompilius',
+            'Вадим Самойлов',
+            'Декабрь',
+            'Земфира',
+            'Калевала',
+            'Крупнов|Крупский',
+            'Легион|Булгаков',
+            'Маврик|Маврин',
+            'Мара',
+            'Ночные Снайперы',
+            'Холодне Сонце',
+            'Чёрный Кофе',
+            'Чиж',
+        ];
+        var artistsString = _getArtistsString(info);
+        for (var i = 0; i < priorityArtists.length; i++) {
+            if ((new RegExp(priorityArtists[i], 'i')).test(artistsString)) {
+                return true;
+            }
+        }
+        return false;
     }
 
     function _load(cmd, id) {
