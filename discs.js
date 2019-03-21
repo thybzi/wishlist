@@ -19,6 +19,11 @@ function renderDiscs(mainTargetElem, auxTargetElem, noncdTargetElem) {
 
     var content = _load('wantlist');
     var data = JSON.parse(content).wants;
+    if (!data) {
+        mainTargetElem.innerHTML = auxTargetElem.innerHTML = noncdTargetElem.innerHTML = 'temporary unavailable';
+        return;
+    }
+
     var mainOutputData = {};
     var mainOutputDataKeys = [];
     var auxOutputData = {};
